@@ -1,0 +1,28 @@
+services:
+  backend:
+    build: .
+    container_name: agrocontrol-backend
+    restart: always
+    ports:
+      - "6868:6868"
+    depends_on:
+      - mongo
+    environment:
+      - MONGO_URI=mongodb://mongo:27777
+      - DB_NAME=agrocontrol_db
+    volumes:
+      - .:/app   # 👈 monta tu proyecto local dentro del contenedor
+    command: uvicorn app.main:app --host 0.0.0.0 --port 6868 --reload --workers 1 --reload-dir /app
+
+  mongo:
+    image: mongo:6.0
+    container_name: agrocontrol-mongo
+    restart: always
+    ports:
+      - "27777:27777"
+    command: ["mongod", "--port", "27777"]
+    volumes:
+      - mongo_data:/data/db
+
+volumes:
+  mongo_data:
